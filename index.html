@@ -10,16 +10,10 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-      table,
-      td,
-      th {
-        border: 1px solid black;
-        text-align: left;
-      }
-      .toast {
-        font-weight: bold;
-      }
       .loader {
+        position: absolute;
+        left: 50%;
+        top: 50%;
         border: 16px solid #f3f3f3; /* Light grey */
         border-top: 16px solid #3498db; /* Blue */
         border-radius: 50%;
@@ -41,45 +35,94 @@
     </style>
   </head>
   <body class="tb">
-    <h1>Product details</h1>
+    <div class="container">
+      <h1>Product details</h1>
 
-    <table class="productTable">
-      <tr>
-        <th>id</th>
-        <th>title</th>
-        <th>description</th>
-        <th>price</th>
-        <th>actions</th>
-      </tr>
-    </table>
-    <div class="loader spin hidden"></div>
-    <div class="toast hidden" style="position: absolute; top: 0; right: 0">
-      <div class="toast-body">Data loaded properly</div>
+      <div class="table-responsive row">
+        <table class="productTable table table-sm">
+          <tr>
+            <div class="col-md-auto">
+              <th>id</th>
+            </div>
+            <div class="col-md-auto">
+              <th>title</th>
+            </div>
+            <div class="col-md-auto">
+              <th>description</th>
+            </div>
+            <div class="col-md-auto">
+              <th>price</th>
+            </div>
+            <div class="col-md-auto">
+              <th>actions</th>
+            </div>
+          </tr>
+        </table>
+      </div>
+      <div class="loader spin hidden"></div>
+      <div
+        class="success-toast hidden bg-primary text-white rounded"
+        style="position: absolute; top: 20px; right: 20px"
+      >
+        <div class="toast-body">Data loaded properly</div>
+      </div>
+      <div
+        class="error-toast hidden bg-primary text-white rounded"
+        style="position: absolute; top: 20px; right: 20px"
+      >
+        <div class="toast-body">Error while loading</div>
+      </div>
     </div>
 
     <script>
       document.querySelector(".loader").classList.remove("hidden");
-      test();
-      function data(num) {
-        Swal.fire({
-          title: "Request is received",
-          icon: "success",
-          confirmButtonText: "Great, show me the info!",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            location = `https://fakestoreapi.com/users/${num}`;
-          }
-        });
+      async function data(num) {
+        fetch(`https://fakestoreapi.com/users/${num}`)
+          .then((response) => response.json())
+          .then((data) =>
+            Swal.fire({
+              html: JSON.stringify(data),
+            })
+          );
+      }
+      let info = localStorage.getItem("info");
+      if (info) {
+        console.log("inside if");
+        info = JSON.parse(info);
+        console.log(info);
+        productById(info);
+        document.querySelector(".success-toast").classList.remove("hidden");
+        setTimeout(
+          () =>
+            document.querySelector(".success-toast").classList.add("hidden"),
+          5000
+        );
+        document.querySelector(".loader").classList.add("hidden");
+      } else {
+        console.log("inside else");
+        test();
       }
       async function test() {
+        console.log("inside test async");
         try {
           const res = await fetch("https://fakestoreapi.com/products/");
           const data = await res.json();
-          console.log(data);
           productById(data);
-          document.querySelector(".toast").classList.add("hidden");
+          document.querySelector(".success-toast").classList.remove("hidden");
+          setTimeout(
+            () =>
+              document.querySelector(".success-toast").classList.add("hidden"),
+            5000
+          );
+          localStorage.setItem("info", JSON.stringify(data));
         } catch (error) {
           console.log(error);
+          document.querySelector(".error-toast").classList.remove("hidden");
+          setTimeout(
+            () =>
+              document.querySelector(".error-toast").classList.add("hidden"),
+            5000
+          );
         } finally {
           //hide the loader
           document.querySelector(".loader").classList.add("hidden");
@@ -89,29 +132,29 @@
       function productById(json) {
         const value = Number("abcd");
         const html = `<tr>
-          <td>abcd</td>
-          <td>"perfume"</td>
-          <td>"The scent that's a rose to your senses.</td>
-          <td>${1000}</td>
-          <td>
-            <button class="btn" onclick="data(${value})">
-              verify
-            </button>
-          </td>
-        </tr>`;
+                <td>abcd</td>
+                <td>"perfume"</td>
+                <td>"The scent that's a rose to your senses.</td>
+                <td>${1000}</td>
+                <td>
+                  <button class="btn btn-outline-info" onclick="data(${value})">
+                    verify
+                  </button>
+                </td>
+              </tr>`;
         document
           .querySelector(".productTable")
           .insertAdjacentHTML("beforeend", html);
         for (const obj of json) {
           const html = `<tr>
-            <td id="${obj.id}">${obj.id}</td>
-            <td>${obj.title}</td>
-            <td>${obj.description}</td>
-            <td>${obj.price}</td>
-            <td>
-              <button class="btn" onclick="data(${obj.id})">verify</button>
-            </td>
-          </tr>`;
+                  <td id="${obj.id}">${obj.id}</td>
+                  <td>${obj.title}</td>
+                  <td>${obj.description}</td>
+                  <td>${obj.price}</td>
+                  <td>
+                    <button class="btn btn-outline-info " onclick="data(${obj.id})">verify</button>
+                  </td>
+                </tr>`;
           document
             .querySelector(".productTable")
             .insertAdjacentHTML("beforeend", html);
