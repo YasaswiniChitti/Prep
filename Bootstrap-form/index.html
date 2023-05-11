@@ -14,17 +14,18 @@
       <div class="row">
         <div class="col-8">
           <h4 class="mb-3">Billing Address</h4>
-          <form novalidate>
-            <div class="row">
+          <form>
+            <div class="row mb-3">
               <div class="col-sm-6">
                 <label>First Name</label>
                 <input
                   type="text"
                   class="form-control"
                   placeholder="Dolly"
+                  pattern="[a-z]{1,15}"
+                  title="First Name should contain lowercase letters"
                   required
                 />
-                <div class="invalid-feedback">Valid First Name is required</div>
               </div>
               <div class="col-sm-6">
                 <label>Last Name</label>
@@ -32,46 +33,59 @@
                   type="text"
                   class="form-control"
                   placeholder="Shetty"
+                  pattern="[a-z]{1,15}"
+                  title="Last Name should contain lowercase letters"
                   required
                 />
-                <div class="invalid-feedback">Valid Last Name is required</div>
               </div>
             </div>
-            <label>Username</label>
-            <div class="input-group-append">
-              <span class="input-group-text">@</span>
+            <div class="mb-3">
+              <label>Username</label>
+              <div class="input-group-append">
+                <span class="input-group-text">@</span>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Username"
+                  pattern="[a-z,A-Z]{1,15}"
+                  title="Username should contain letters"
+                  required
+                />
+              </div>
+            </div>
+            <div class="mb-3">
+              <label>Email <span class="text-muted">(Optional)</span></label>
+              <input
+                type="email"
+                class="form-control"
+                placeholder="you@example.com"
+                value=""
+              />
+            </div>
+            <div class="mb-3">
+              <label>Address</label>
               <input
                 type="text"
                 class="form-control"
-                placeholder="Username"
+                placeholder="1234 Main St"
+                pattern="[a-zA-Z0-9 ]{5,40}"
+                title="Address should conatin letters,digits,white spaces"
                 required
               />
             </div>
-            <label>Email</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="you@example.com"
-              required
-            />
-            <label>Address</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="1234 Main St"
-              required
-            />
-            <label>Address2</label>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Apartment or Suite"
-              required
-            />
+            <div class="mb-3">
+              <label>Address2<span class="text-muted">(Optional)</span></label>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Apartment or Suite"
+                value=""
+              />
+            </div>
             <div class="row">
               <div class="col-sm-4">
                 <label>Country</label>
-                <select class="form-control">
+                <select class="form-control" required>
                   <option value="">Choose..</option>
                   <option value="India">IN</option>
                   <option value="Australia">AU</option>
@@ -80,7 +94,7 @@
               </div>
               <div class="col-sm-4">
                 <label>State</label>
-                <select class="form-control">
+                <select class="form-control" required>
                   <option value="">Choose..</option>
                   <option value="Andhra Pradesh">AP</option>
                   <option value="Telangana">TE</option>
@@ -91,31 +105,35 @@
               </div>
               <div class="col-sm-3">
                 <label>Zip</label>
-                <input type="text" class="form-control" />
+                <input
+                  type="text"
+                  class="form-control"
+                  pattern="(\d){7}"
+                  title="should contain 7 numbers"
+                />
               </div>
             </div>
 
             <hr class="my-4" />
 
             <div class="form-check">
-              <input type="checkbox" required />
-              <lable>Shipping address is the same as my billing address</lable>
+              <input class="form-check-input" type="checkbox" value="" />
+              <label class="form-check-label">
+                Shipping address is the same as my billing address</label
+              >
             </div>
             <div class="form-check">
-              <input type="checkbox" required />
-              <lable>Save this information for next time</lable>
+              <input class="form-check-input" type="checkbox" value="" />
+              <label class="form-check-label">
+                Save this information for next time</label
+              >
             </div>
 
             <hr class="my-4" />
 
             <h4>Payment</h4>
             <div class="form-check">
-              <input
-                type="radio"
-                class="form-check-input"
-                value="option1"
-                checked
-              />
+              <input type="radio" class="form-check-input" value="option1" />
               <lable>Credit card</lable>
             </div>
             <div class="form-check">
@@ -130,22 +148,51 @@
             <div class="row my-4">
               <div class="col-sm-6">
                 <label>Name on card</label>
-                <input type="text" class="form-control" />
-                <small>Full name as displayed on card</small>
+                <input
+                  type="text"
+                  class="form-control"
+                  pattern="[a-zA-Z ]{5, 20}"
+                  title="Please provide the correct name on the card"
+                  required
+                />
+                <small class="text-muted">Full name as displayed on card</small>
               </div>
               <div class="col-sm-6">
                 <label>Credit card number</label>
-                <input type="text" class="form-control" />
+                <input
+                  type="number"
+                  class="form-control"
+                  onblur="
+                var cc_number_saved = this.value; this.value =
+                this.value.replace(/[^\d]/g, ''); if(!checkLuhn(this.value)) {
+                alert('Sorry, that is not a valid number - please try again!');
+                this.value = '';}"
+                  onfocus="
+                if(this.value != cc_number_saved) this.value = cc_number_saved;"
+                  required
+                />
               </div>
             </div>
             <div class="row">
               <div class="col-sm-2">
                 <label>Expiration</label>
-                <input type="text" class="form-control" />
+                <input
+                  type="text"
+                  class="form-control"
+                  pattern="(?:0[1-9]|1[0-2])/[0-9]{2}"
+                  title="Enter a date in this format MM/YY"
+                  required
+                />
               </div>
-              <div class="col-sm-1">
+              <div class="col-sm-2">
                 <label>CVV</label>
-                <input type="text" class="form-control" />
+                <input
+                  type="password"
+                  class="form-control"
+                  pattern="(\d){3}"
+                  titile="Should contain 3 digits"
+                  required
+                />
               </div>
             </div>
 
@@ -195,20 +242,36 @@
               <strong>$20</strong>
             </li>
           </ul>
-          <div class="input-group">
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Promo code"
-              required
-            />
-            <div class="input-group-append">
-              <button type="submit" class="btn-secondary">Redeem</button>
+          <form class="card p-2">
+            <div class="input-group">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Promo code"
+                required
+              />
+              <div class="input-group-append">
+                <button type="submit" class="btn btn-secondary">Redeem</button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </div>
+    <script>
+      function checkLuhn(input) {
+        console.log(input);
+        var sum = 0;
+        var numdigits = input.length;
+        var parity = numdigits % 2;
+        for (var i = 0; i < numdigits; i++) {
+          var digit = parseInt(input.charAt(i));
+          if (i % 2 == parity) digit *= 2;
+          if (digit > 9) digit -= 9;
+          sum += digit;
+        }
+        return sum % 10 == 0;
+      }
+    </script>
   </body>
 </html>
-
